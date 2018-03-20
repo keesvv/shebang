@@ -37,11 +37,13 @@ descriptor=$(curl -fs --output /dev/stderr --write-out "%{http_code}" "$install_
 # Check if a common error code is returned
 if [[ "$descriptor" -ne 200 ]]; then
   if [[ "$descriptor" = 404 ]]; then
-    err "The shebang.json file could not be found in this repository."
-    err "Please report this to the author of the repository."
-    err "If you are the author, see github.com/keesvv/shebang for more info."
+    err "The shebang.json file could not be found in this repository (error $descriptor)."
+  else
+    err "An unknown error has occured (error $descriptor). "
   fi
+
+  err "Please report this to the author of the repository."
+  err "If you are the author, see github.com/keesvv/shebang for more info."
 else
   log "Install descriptor found!"
-  echo "$descriptor"
 fi
