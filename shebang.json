@@ -1,4 +1,5 @@
 {
   "name": "Sample package",
+  "id": "sample-package",
   "version": "1.0.0"
 }
