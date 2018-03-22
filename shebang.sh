@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 function printSyntax {
   echo "Error: You must specify a GitHub username and repository."
-  echo -e "Format: \e[96mshebang <username>/<repository> [branch]\e[0m"
+  echo -e "Format: \e[90mshebang \e[0m<\e[96musername\e[0m>/<\e[96mrepository\e[0m> [\e[96mbranch\e[0m]"
   echo "Example:"
-  echo -e "    \e[96mshebang keesvv/shebang\e[0m\n"
-  echo -e "If you would like to create a package, type \e[96mshebang\e[0m"
+  echo -e "    \e[90mshebang \e[96mkeesvv\e[0m/\e[96mshebang\e[0m\n"
+  echo -e "If you would like to create a package, type \e[90mshebang \e[96mcreate\e[0m"
   exit
 }
 
@@ -16,8 +16,30 @@ function err {
   echo -e "\e[91m[!]\e[0m $1"
 }
 
+function createShebang {
+  skeleton_url="https://raw.githubusercontent.com/keesvv/shebang/master/shebang.json"
+  json_skeleton=$(curl -fs "$skeleton_url")
+
+  echo -e "\e[90mNOTE: A package id is always in the format \e[95mpackage-name\e[90m,"
+  echo -e "\e[90mevery character must be lower-case and only dashes and alphanumeric characters"
+  echo -e "\e[90mare allowed.\e[0m"
+
+  read -p "Package id: " package_id
+  read -p "Package name: " package_name
+  read -p "Package version: " package_version
+
+  json_skeleton=$(echo "$json_skeleton" | jq '.id = "$package_id"')
+  echo "$json_skeleton" > $package_id.json
+  nano $package_id.json
+}
+
+# Check if arguments are not null
 if [[ "$1" = "" ]]; then
   printSyntax
+  exit 0
+elif [[ "$1" = "create" ]]; then
+  createShebang
+  exit 0
 fi
 
 # Check if branch argument was given
@@ -60,8 +82,8 @@ if [[ "$status_code" -ne 200 ]]; then
 else
 
   # Extract all entries from the JSON descriptor
-  name=$(echo $descriptor | jq -r ".name")
   id=$(echo $descriptor | jq -r ".id")
+  name=$(echo $descriptor | jq -r ".name")
   version=$(echo $descriptor | jq -r ".version")
 
   # Print the package information
@@ -74,5 +96,7 @@ else
   log "Cloning repository to \e[92m$home_dir/shebang/$id\e[0m ..."
   git clone -q -b "$branch" "https://github.com/$repository" "$home_dir/shebang/$id"
   log "Done cloning repository."
+
+
 
 fi
