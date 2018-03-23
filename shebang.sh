@@ -26,16 +26,25 @@ function createShebang {
   read -p "Package name: " package_name
   read -p "Package version: " package_version
 
+  # Build a JSON skeleton
   json_skeleton=$(echo "{}" |
     jq ".id = \"$package_id\"" |
     jq ".name = \"$package_name\"" |
     jq ".version = \"$package_version\"")
 
+  # Store the home directory into a local variable
   home_dir=$(eval echo ~)
+
+  # Check if the descriptors directory exists
+  if [[ ! -d "$home_dir/shebang/descriptors" ]]; then
+    mkdir "$home_dir/shebang/descriptors"
+  fi
+
   descriptor_path="$home_dir/shebang/descriptors/$package_id.json"
   echo "$json_skeleton" > "$descriptor_path"
   printf "\n" && echo "$json_skeleton" | jq -C . && printf "\n"
 
+  # Ask user if descriptor information is correct
   read -r -p "Is this package descriptor correct? [y/N]" is_correct
   is_correct=${is_correct,,}
   if [[ ! "$is_correct" =~ ^(yes|y)$ ]]; then
