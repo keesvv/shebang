@@ -54,6 +54,7 @@ elif [[ "$1" = "create" ]]; then
   exit 0
 elif [[ "$1" = "update" ]]; then
   ./usr/share/shebang/install.sh
+  exit 0
 fi
 
 # Check if branch argument was given
