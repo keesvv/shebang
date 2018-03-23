@@ -1,4 +1,7 @@
 # Shebang
+
+[![Build Status](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
+
 📦 A package manager for GitHub repositories.
 
 # Installation
