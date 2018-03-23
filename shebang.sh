@@ -4,7 +4,8 @@ function printSyntax {
   echo -e "Format: \e[90mshebang \e[0m<\e[96musername\e[0m>/<\e[96mrepository\e[0m> [\e[96mbranch\e[0m]"
   echo "Example:"
   echo -e "    \e[90mshebang \e[96mkeesvv\e[0m/\e[96mshebang\e[0m\n"
-  echo -e "If you would like to create a package, type \e[90mshebang \e[96mcreate\e[0m"
+  echo -e "If you would like to create a package, type \e[90mshebang \e[96mcreate\e[0m."
+  echo -e "You can also easily update Shebang by typing \e[90mshebang \e[96mupdate\e[0m."
   exit
 }
 
@@ -30,7 +31,9 @@ function createShebang {
     jq ".name = \"$package_name\"" |
     jq ".version = \"$package_version\"")
 
-  echo "$json_skeleton" > "$package_id.json"
+  home_dir=$(eval echo ~)
+  descriptor_path="$home_dir/shebang/descriptors/$package_id.json"
+  echo "$json_skeleton" > "$descriptor_path"
   printf "\n" && echo "$json_skeleton" | jq -C . && printf "\n"
 
   read -r -p "Is this package descriptor correct? [y/N]" is_correct
@@ -39,7 +42,7 @@ function createShebang {
     nano -E "$package_id.json"
   fi
 
-  echo -e "Package descriptor saved to \e[92m$package_id.json\e[0m."
+  echo -e "Package descriptor saved to \e[92m$descriptor_path\e[0m."
 }
 
 # Check if arguments are not null
@@ -49,6 +52,8 @@ if [[ "$1" = "" ]]; then
 elif [[ "$1" = "create" ]]; then
   createShebang
   exit 0
+elif [[ "$1" = "update" ]]; then
+  ./usr/share/shebang/install.sh
 fi
 
 # Check if branch argument was given
@@ -89,7 +94,6 @@ if [[ "$status_code" -ne 200 ]]; then
   err "Please report this to the author of the repository."
   err "If you are the author, see github.com/keesvv/shebang for more info."
 else
-
   # Extract all entries from the JSON descriptor
   id=$(echo $descriptor | jq -r ".id")
   name=$(echo $descriptor | jq -r ".name")
@@ -102,8 +106,8 @@ else
   home_dir=$(eval echo ~)
 
   # Clone repository to local files
-  log "Cloning repository to \e[92m$home_dir/shebang/$id\e[0m ..."
-  git clone -q -b "$branch" "https://github.com/$repository" "$home_dir/shebang/$id"
+  clone_path="$home_dir/shebang/packages/$id"
+  log "Cloning repository to \e[92m$clone_path\e[0m ..."
+  git clone -q -b "$branch" "https://github.com/$repository" "$clone_path"
   log "Done cloning repository."
-
 fi
