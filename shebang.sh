@@ -63,7 +63,7 @@ repository="$1"
 install_script="https://raw.githubusercontent.com/$repository/$branch/shebang.json"
 
 # Clear the screen
-# clear
+clear
 
 # Get the install descriptor
 echo SHEBANG | toilet -f pagga | lolcat -F 0.25 && printf "\n"
