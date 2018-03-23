@@ -17,9 +17,6 @@ function err {
 }
 
 function createShebang {
-  skeleton_url="https://raw.githubusercontent.com/keesvv/shebang/master/shebang.json"
-  json_skeleton=$(curl -fs "$skeleton_url")
-
   echo -e "\e[90mNOTE: A package id is always in the format \e[95mpackage-name\e[90m,"
   echo -e "\e[90mevery character must be lower-case and only dashes and alphanumeric characters"
   echo -e "\e[90mare allowed.\e[0m"
@@ -28,9 +25,21 @@ function createShebang {
   read -p "Package name: " package_name
   read -p "Package version: " package_version
 
-  json_skeleton=$(echo "$json_skeleton" | jq '.id = "$package_id"')
-  echo "$json_skeleton" > $package_id.json
-  nano $package_id.json
+  json_skeleton=$(echo "{}" |
+    jq ".id = \"$package_id\"" |
+    jq ".name = \"$package_name\"" |
+    jq ".version = \"$package_version\"")
+
+  echo "$json_skeleton" > "$package_id.json"
+  printf "\n" && echo "$json_skeleton" | jq -C . && printf "\n"
+
+  read -r -p "Is this package descriptor correct? [y/N]" is_correct
+  is_correct=${is_correct,,}
+  if [[ ! "$is_correct" =~ ^(yes|y)$ ]]; then
+    nano -E "$package_id.json"
+  fi
+
+  echo -e "Package descriptor saved to \e[92m$package_id.json\e[0m."
 }
 
 # Check if arguments are not null
@@ -54,7 +63,7 @@ repository="$1"
 install_script="https://raw.githubusercontent.com/$repository/$branch/shebang.json"
 
 # Clear the screen
-clear
+# clear
 
 # Get the install descriptor
 echo SHEBANG | toilet -f pagga | lolcat -F 0.25 && printf "\n"
@@ -96,7 +105,5 @@ else
   log "Cloning repository to \e[92m$home_dir/shebang/$id\e[0m ..."
   git clone -q -b "$branch" "https://github.com/$repository" "$home_dir/shebang/$id"
   log "Done cloning repository."
-
-
 
 fi
