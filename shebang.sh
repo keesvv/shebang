@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 function print_syntax {
   echo "Error: You must specify a GitHub username and repository."
-  echo -e "Format: \e[90mshebang \e[0m<\e[96musername\e[0m>/<\e[96mrepository\e[0m> [\e[96mbranch\e[0m]"
+  echo -e "Format: \e[90mshebang install \e[0m<\e[96musername\e[0m>/<\e[96mrepository\e[0m> [\e[96mbranch\e[0m]"
   echo "Example:"
-  echo -e "    \e[90mshebang \e[96mkeesvv\e[0m/\e[96mshebang\e[0m\n"
+  echo -e "    \e[90mshebang install \e[96mkeesvv\e[0m/\e[96mshebang\e[0m\n"
   echo -e "If you would like to create a package, type \e[90mshebang \e[96mcreate\e[0m."
   echo -e "You can also easily update Shebang by typing \e[90mshebang \e[96mupdate\e[0m."
   exit
