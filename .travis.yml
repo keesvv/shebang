@@ -5,3 +5,5 @@ before_script:
   - ./install.sh
 script:
   - ./shebang.sh
+  - ./shebang.sh update
+  - ./shebang.sh keesvv/shebang master
