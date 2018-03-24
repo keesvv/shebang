@@ -1,0 +1,5 @@
+language: bash
+before_script:
+  - ./install.sh
+script:
+  - ./shebang.sh
