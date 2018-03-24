@@ -1,9 +1,8 @@
 # Shebang
 
-[![Join the chat at https://gitter.im/shebang-package-manager/Lobby](https://badges.gitter.im/shebang-package-manager/Lobby.svg)](https://gitter.im/shebang-package-manager/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Build Status](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
 [![codecov](https://codecov.io/gh/keesvv/shebang/branch/master/graph/badge.svg)](https://codecov.io/gh/keesvv/shebang)
+[![Join the chat at https://gitter.im/shebang-package-manager/Lobby](https://badges.gitter.im/shebang-package-manager/Lobby.svg)](https://gitter.im/shebang-package-manager/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 📦 A package manager for GitHub repositories.
 
