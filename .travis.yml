@@ -16,7 +16,8 @@ before_script:
 script:
   - ./shebang.sh
   - ./shebang.sh update
-  - ./shebang.sh keesvv/shebang master
+  - ./shebang.sh install keesvv/shebang master
+  - ./shebang.sh remove sample-package
 
 after_success: |
   wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
