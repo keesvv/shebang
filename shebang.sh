@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
+home_dir=$(eval echo ~)
+
 function print_syntax {
   echo "Error: You must specify a GitHub username and repository."
   echo -e "Format: \e[90mshebang install \e[0m<\e[96musername\e[0m>/<\e[96mrepository\e[0m> [\e[96mbranch\e[0m]"
   echo "Example:"
-  echo -e "    \e[90mshebang install \e[96mkeesvv\e[0m/\e[96mshebang\e[0m\n"
+  echo -e "    \e[90mshebang install \e[96mkeesvv\e[0m/\e[96mshebang\e[0m"
+  echo "To remove a package, you can use the following command:"
+  echo -e "    \e[90mshebang remove \e[96mpackage-id\e[0m\n"
   echo -e "If you would like to create a package, type \e[90mshebang \e[96mcreate\e[0m."
   echo -e "You can also easily update Shebang by typing \e[90mshebang \e[96mupdate\e[0m."
   exit
+}
+
+function print_splash {
+  echo SHEBANG | toilet -f pagga | lolcat -F 0.25 && printf "\n"
 }
 
 function log_info {
@@ -15,6 +23,10 @@ function log_info {
 
 function log_err {
   echo -e "\e[91m[!]\e[0m $1"
+}
+
+function log_warn {
+  echo -e "\e[93m[~]\e[0m $1"
 }
 
 function install_shebang {
@@ -32,9 +44,19 @@ function install_shebang {
   # Clear the screen
   clear
 
+  # Print the splash text
+  print_splash
+
   # Get the install descriptor
-  echo SHEBANG | toilet -f pagga | lolcat -F 0.25 && printf "\n"
   log_info "Getting install descriptor..."
+
+  # Check if repository is not null
+  if [[ "$repository" = "" ]]; then
+    log_err "Please specify a repository to install."
+    log_err "To view the syntax, type \e[90mshebang\e[0m."
+    exit 0
+  fi
+
   descriptor=$(curl -fs "$install_script")
 
   # Get the status code
@@ -64,11 +86,17 @@ function install_shebang {
     # Print the package information
     log_info "Installing $name (v-$version) ..."
 
-    # Store home directory into a variable
-    home_dir=$(eval echo ~)
+    # Define the clone path
+    clone_path="$home_dir/shebang/packages/$id"
+
+    # Check if package is already installed
+    if [[ -d "$clone_path" ]]; then
+      log_warn "This package is already installed on your system."
+      log_warn "To remove this package, type \e[90mshebang remove \e[92m$id\e[0m."
+      exit 0
+    fi
 
     # Clone repository to local files
-    clone_path="$home_dir/shebang/packages/$id"
     log_info "Cloning repository to \e[92m$clone_path\e[0m ..."
     git clone -q -b "$branch" "https://github.com/$repository" "$clone_path"
     log_info "Done cloning repository."
@@ -90,9 +118,6 @@ function create_shebang {
     jq ".name = \"$package_name\"" |
     jq ".version = \"$package_version\"")
 
-  # Store the home directory into a local variable
-  home_dir=$(eval echo ~)
-
   # Check if the descriptors directory exists
   if [[ ! -d "$home_dir/shebang/descriptors" ]]; then
     mkdir "$home_dir/shebang/descriptors"
@@ -112,17 +137,52 @@ function create_shebang {
   echo -e "Package descriptor saved to \e[92m$descriptor_path\e[0m."
 }
 
-# Check if arguments are not null
-if [[ "$1" = "" ]]; then
-  print_syntax
-  exit 0
-elif [[ "$1" = "install" ]]; then
+function remove_shebang {
+  if [[ "$1" = "" ]]; then
+    log_err "You need to specify a package to remove."
+    log_err "To remove this package, type \e[90mshebang remove \e[92mpackage-id\e[0m."
+    exit 0
+  fi
+
+  # Clear the screen
+  clear
+
+  # Print the splash text
+  print_splash
+  log_info "Removing package \e[92m$1\e[0m..."
+
+  # Check if package directory exists
+  if [[ ! -d "$home_dir/shebang/packages/$1" ]]; then
+    log_err "Package \e[92m$1\e[0m not found, have you spelled it correctly?"
+    log_err "There is no package to remove."
+    exit 0
+  fi
+
+  # Remove the package
+  sudo rm -R "$home_dir/shebang/packages/$1"
+
+  # Print success message
+  log_info "Package \e[92m$1\e[0m has been removed successfully!"
+}
+
+# Check arguments
+if [[ "$1" = "install" ]]; then
   install_shebang "$2" "$3"
   exit 0
+
 elif [[ "$1" = "create" ]]; then
   create_shebang
   exit 0
+
+elif [[ "$1" = "remove" ]]; then
+  remove_shebang "$2"
+  exit 0
+
 elif [[ "$1" = "update" ]]; then
   /usr/share/shebang/install.sh
+  exit 0
+
+else
+  print_syntax
   exit 0
 fi
