@@ -1,6 +1,7 @@
 # Shebang
 
 [![Build Status](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
+[![codecov](https://codecov.io/gh/keesvv/shebang/branch/master/graph/badge.svg)](https://codecov.io/gh/keesvv/shebang)
 
 📦 A package manager for GitHub repositories.
 
