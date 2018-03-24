@@ -1,5 +1,11 @@
 language: bash
 sudo: required
+
+addons:
+  apt:
+    packages:
+      - kcov
+
 before_script:
   - chmod +x *.sh
   - ./install.sh
@@ -7,3 +13,7 @@ script:
   - ./shebang.sh
   - ./shebang.sh update
   - ./shebang.sh keesvv/shebang master
+after_success:
+  - mkdir -p coverage
+  - kcov coverage shebang.sh
+  - bash <(curl -s https://codecov.io/bash)
