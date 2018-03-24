@@ -82,9 +82,16 @@ function install_shebang {
     id=$(echo $descriptor | jq -r ".id")
     name=$(echo $descriptor | jq -r ".name")
     version=$(echo $descriptor | jq -r ".version")
+    executable=$(echo $descriptor | jq -r ".properties.executable")
+    symlink_name=$(echo $descriptor | jq -r ".properties.symlink_name")
+    before_install_script=$(echo $descriptor | jq -r ".properties.commands.before_install")
+    after_install_script=$(echo $descriptor | jq -r ".properties.commands.after_install")
 
     # Print the package information
     log_info "Installing $name (v-$version) ..."
+
+    # Execute the 'before install' command script
+    bash -c "$before_install_script"
 
     # Define the clone path
     clone_path="$home_dir/shebang/packages/$id"
@@ -100,6 +107,20 @@ function install_shebang {
     log_info "Cloning repository to \e[92m$clone_path\e[0m ..."
     git clone -q -b "$branch" "https://github.com/$repository" "$clone_path"
     log_info "Done cloning repository."
+
+    # Set executable permissions to all files in package
+    old_dir=$(pwd)
+    cd "$clone_path"
+    sudo chmod -R +x *.*
+    cd "$old_dir"
+
+    # Create a symlink to the main executable
+    log_info "Creating symlink..."
+    sudo ln -s "$clone_path/$executable" "/usr/bin/$symlink_name"
+    log_info "Done creating symlink."
+
+    # Execute the 'after install' command script
+    bash -c "$after_install_script"
   fi
 }
 
@@ -116,7 +137,12 @@ function create_shebang {
   json_skeleton=$(echo "{}" |
     jq ".id = \"$package_id\"" |
     jq ".name = \"$package_name\"" |
-    jq ".version = \"$package_version\"")
+    jq ".version = \"$package_version\"" |
+    jq ".properties.executable = \"\"" |
+    jq ".properties.symlink_name = \"\"" |
+    jq ".properties.commands.before_install = \"\"" |
+    jq ".properties.commands.after_install = \"\""
+  )
 
   # Check if the descriptors directory exists
   if [[ ! -d "$home_dir/shebang/descriptors" ]]; then
@@ -125,15 +151,12 @@ function create_shebang {
 
   descriptor_path="$home_dir/shebang/descriptors/$package_id.json"
   echo "$json_skeleton" > "$descriptor_path"
-  printf "\n" && echo "$json_skeleton" | jq -C . && printf "\n"
 
-  # Ask user if descriptor information is correct
-  read -r -p "Is this package descriptor correct? [y/N]" is_correct
-  is_correct=${is_correct,,}
-  if [[ ! "$is_correct" =~ ^(yes|y)$ ]]; then
-    nano -E "$package_id.json"
-  fi
+  # Open a new NANO editor for the descriptor file
+  nano -E "$descriptor_path"
 
+  # Print the final package descriptor
+  printf "\n" && cat "$descriptor_path" | jq -C . && printf "\n"
   echo -e "Package descriptor saved to \e[92m$descriptor_path\e[0m."
 }
 
