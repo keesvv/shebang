@@ -1,5 +1,13 @@
 {
   "id": "sample-package",
   "name": "Sample package",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "properties": {
+    "executable": "shebang.sh",
+    "symlink_name": "sample-package",
+    "commands": {
+      "before_install": "echo \"Sample before install message\"",
+      "after_install": "echo \"Sample after install message\""
+    }
+  }
 }
