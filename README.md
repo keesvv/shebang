@@ -1,8 +1,11 @@
-# Shebang
+# Shebang (Development)
 
 [![Build Status](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
 [![codecov](https://codecov.io/gh/keesvv/shebang/branch/master/graph/badge.svg)](https://codecov.io/gh/keesvv/shebang)
 [![Join the chat at https://gitter.im/shebang-package-manager/Lobby](https://badges.gitter.im/shebang-package-manager/Lobby.svg)](https://gitter.im/shebang-package-manager/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+> You are currently in the **Development** branch. Experimental features will be roaming in this branch.
+> If you want to be sure you have a stable release, switch to the **master** branch instead.
 
 📦 A package manager for GitHub repositories.
 
