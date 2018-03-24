@@ -1,6 +1,5 @@
 # Shebang
 
-[![Build Status (AppVeyor)](https://ci.appveyor.com/api/projects/status/1lherr1kvngqod7f?svg=true)](https://ci.appveyor.com/project/keesvv/shebang)
 [![Build Status (Travis CI)](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
 [![codecov](https://codecov.io/gh/keesvv/shebang/branch/master/graph/badge.svg)](https://codecov.io/gh/keesvv/shebang)
 [![Join the chat at https://gitter.im/shebang-package-manager/Lobby](https://badges.gitter.im/shebang-package-manager/Lobby.svg)](https://gitter.im/shebang-package-manager/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
