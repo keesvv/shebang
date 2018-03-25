@@ -16,7 +16,6 @@ notifications:
     on_success: never
     on_failure: always
 
-
 before_script:
   - chmod +x *.sh
   - ./install.sh
