@@ -9,6 +9,14 @@ addons:
       - libdw-dev
       - cmake
 
+notifications:
+  email:
+    recipients:
+      - kees.van.voorthuizen@gmail.com
+    on_success: never
+    on_failure: always
+
+
 before_script:
   - chmod +x *.sh
   - ./install.sh
