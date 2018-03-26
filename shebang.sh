@@ -156,7 +156,7 @@ function create_shebang {
   nano -E "$descriptor_path"
 
   # Print the final package descriptor
-  printf "\n" && < "$descriptor_path" | jq -C . && printf "\n"
+  printf "\n" && < "$descriptor_path" jq -C . && printf "\n"
   echo -e "Package descriptor saved to \e[92m$descriptor_path\e[0m."
 }
 
