@@ -17,6 +17,7 @@ notifications:
     on_failure: always
 
 before_script:
+  - sudo apt-get install -y jq toilet lolcat
   - chmod +x *.sh
 
 script:
