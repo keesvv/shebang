@@ -15,7 +15,7 @@ sudo git clone "https://github.com/keesvv/shebang" "/usr/share/shebang"
 
 # Modify executable permissions and make symlink
 cd "/usr/share/shebang"
-sudo chmod -R +x *.sh
+sudo chmod -R +x ./*.sh
 if [[ ! -f "/usr/bin/shebang" ]]; then
   sudo ln -s "/usr/share/shebang/shebang.sh" "/usr/bin/shebang"
 fi
