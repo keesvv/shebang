@@ -111,7 +111,7 @@ function install_shebang {
     # Set executable permissions to all files in package
     old_dir=$(pwd)
     cd "$clone_path"
-    sudo chmod -R +x *.*
+    sudo chmod -R +x ./*.*
     cd "$old_dir"
 
     # Create a symlink to the main executable
