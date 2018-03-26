@@ -129,9 +129,9 @@ function create_shebang {
   echo -e "\e[90mevery character must be lower-case and only dashes and alphanumeric characters"
   echo -e "\e[90mare allowed.\e[0m"
 
-  read -p "Package id: " package_id
-  read -p "Package name: " package_name
-  read -p "Package version: " package_version
+  read -p -r "Package id: " package_id
+  read -p -r "Package name: " package_name
+  read -p -r "Package version: " package_version
 
   # Build a JSON skeleton
   json_skeleton=$(echo "{}" |
@@ -156,7 +156,7 @@ function create_shebang {
   nano -E "$descriptor_path"
 
   # Print the final package descriptor
-  printf "\n" && cat "$descriptor_path" | jq -C . && printf "\n"
+  printf "\n" && < "$descriptor_path" | jq -C . && printf "\n"
   echo -e "Package descriptor saved to \e[92m$descriptor_path\e[0m."
 }
 
