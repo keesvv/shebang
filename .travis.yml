@@ -18,9 +18,9 @@ notifications:
 
 before_script:
   - chmod +x *.sh
-  - ./install.sh
 
 script:
+  - ./install.sh
   - ./shebang.sh
   - ./shebang.sh update
   - ./shebang.sh install keesvv/shebang master
