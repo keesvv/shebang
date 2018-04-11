@@ -1,5 +1,6 @@
 # Shebang
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status (Travis CI)](https://travis-ci.org/keesvv/shebang.svg?branch=master)](https://travis-ci.org/keesvv/shebang)
 [![codecov](https://codecov.io/gh/keesvv/shebang/branch/master/graph/badge.svg)](https://codecov.io/gh/keesvv/shebang)
 [![CodeFactor](https://www.codefactor.io/repository/github/keesvv/shebang/badge/master)](https://www.codefactor.io/repository/github/keesvv/shebang/overview/master)
