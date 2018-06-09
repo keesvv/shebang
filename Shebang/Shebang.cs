@@ -63,7 +63,7 @@ namespace Shebang
             string descriptorUrl = $"https://raw.githubusercontent.com/{repository}/{branch}/shebang.json";
 
             Log("Getting install descriptor...");
-            if (repository == "")
+            if (string.IsNullOrEmpty(repository))
             {
                 Log("Please specify a repository to install.", LogType.ERROR);
                 return;
@@ -79,7 +79,8 @@ namespace Shebang
                 string packageFolder = Path.Combine(GetPackagesFolder(), package.ID);
                 if (Directory.Exists(packageFolder))
                 {
-                    Directory.Delete(packageFolder, true);
+                    Log($"{package.Name} already exists, reinstalling...");
+                    Utils.ForceDeleteDirectory(packageFolder);
                 }
 
                 Repository.Clone(repositoryUrl, packageFolder, new CloneOptions()
