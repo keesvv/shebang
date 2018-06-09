@@ -36,7 +36,7 @@ function install_shebang {
   else
     branch="$2"
   fi
-
+  
   # Set local variables
   repository="$1"
   install_script="https://raw.githubusercontent.com/$repository/$branch/shebang.json"
