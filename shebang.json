@@ -7,8 +7,15 @@
     "symlink_name": "sample-package",
     "is_registered_package": true,
     "commands": {
-      "before_install": "echo \"Sample before install message\"",
-      "after_install": "echo \"Sample after install message\""
+      "before_install": {
+        "windows": "echo \"Sample before install message\"",
+        "unix": "echo \"Sample before install message\""
+      },
+      
+      "after_install": {
+        "windows": "echo \"Sample after install message\"",
+        "unix": "echo \"Sample after install message\""
+      }
     }
   }
 }
