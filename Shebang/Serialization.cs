@@ -39,19 +39,26 @@ namespace Shebang
             public PackageCommands Commands { get; set; }
         }
 
+        public class PackageCommand
+        {
+            [JsonProperty("windows")]
+            public string WindowsCommand { get; set; }
+
+            [JsonProperty("unix")]
+            public string UnixCommand { get; set; }
+        }
+
         public class PackageCommands
         {
-            
-
             [JsonProperty("before_install")]
-            public string BeforeInstall { get; set; }
+            public PackageCommand BeforeInstall { get; set; }
 
             [JsonProperty("after_install")]
-            public string AfterInstall { get; set; }
+            public PackageCommand AfterInstall { get; set; }
 
             public void Execute(ScriptType type)
             {
-                string command = string.Empty;
+                PackageCommand command = null;
                 switch (type)
                 {
                     case ScriptType.BEFORE_INSTALL:
@@ -64,32 +71,48 @@ namespace Shebang
                         break;
                 }
 
+                var process = new Process();
                 switch (Environment.OSVersion.Platform)
                 {
                     case PlatformID.Win32S:
                     case PlatformID.Win32Windows:
                     case PlatformID.Win32NT:
                     case PlatformID.WinCE:
-                        // TO-DO: Add support for Windows
-                        Log("Apparently, you seem to use Windows. Shebang currently doesn't support Windows systems.", LogType.WARN);
-                        Log("If you'd like, you could still use Shebang with WSL (Linux Subsystem for Windows).", LogType.WARN);
+                        // Windows-based systems
+                        if (string.IsNullOrWhiteSpace(command.WindowsCommand)) return;
+                        process.StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = "powershell",
+                            Arguments = "-Command \"" + command.WindowsCommand + "\"",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true
+                        };
                         break;
                     case PlatformID.Unix:
                     case PlatformID.MacOSX:
-                        new Process()
+                        // Unix-based systems
+                        if (string.IsNullOrWhiteSpace(command.UnixCommand)) return;
+                        process.StartInfo = new ProcessStartInfo()
                         {
-                            StartInfo = new ProcessStartInfo()
-                            {
-                                FileName = "bash",
-                                Arguments = "-c \"" + command + "\"",
-                                UseShellExecute = true,
-                                RedirectStandardOutput = true
-                            }
-                        }.Start();
+                            FileName = "bash",
+                            Arguments = "-c \"" + command.UnixCommand + "\"",
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true
+                        };
                         break;
                     default:
                         break;
                 }
+
+                // Write the output data
+                process.OutputDataReceived += (o, ev) =>
+                {
+                    Console.WriteLine(ev.Data);
+                };
+
+                process.Start();
+                process.BeginOutputReadLine();
+                process.WaitForExit();
             }
         }
     }

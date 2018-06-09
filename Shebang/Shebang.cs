@@ -79,37 +79,69 @@ namespace Shebang
                 string packageFolder = Path.Combine(GetPackagesFolder(), package.ID);
                 if (Directory.Exists(packageFolder))
                 {
-                    Log($"{package.Name} already exists, reinstalling...");
+                    Log($"'{package.ID}' already exists, reinstalling...");
                     Utils.ForceDeleteDirectory(packageFolder);
                 }
 
+                Log("Cloning repository...");
                 Repository.Clone(repositoryUrl, packageFolder, new CloneOptions()
                 {
-                    BranchName = branch,
-                    
+                    BranchName = branch
                 });
 
                 Log("Successfully cloned.");
-                //package.Properties.Commands.Execute(ScriptType.BEFORE_INSTALL);
+                Log("Running preinstall script...");
+                package.Properties.Commands.Execute(ScriptType.BEFORE_INSTALL);
+
+                Log("Setting permissions...");
+                try
+                {
+                    var files = Directory.GetFiles(packageFolder, "*.*", SearchOption.AllDirectories);
+                    foreach (var file in files)
+                    {
+                        FileInfo fileInfo = new FileInfo(file);
+                        fileInfo.Attributes = FileAttributes.Normal;
+                    }
+                }
+                catch (Exception)
+                {
+                    Log("Error while setting permissions; do you have administrator/superuser rights?", LogType.ERROR);
+                }
+
+                // TO-DO: Create symlinks
+
+                Log("Running postinstall script...");
+                package.Properties.Commands.Execute(ScriptType.AFTER_INSTALL);
             }
             catch (WebException e)
             {
                 HttpWebResponse response = (HttpWebResponse)e.Response;
-                switch (response.StatusCode)
+                try
                 {
-                    case HttpStatusCode.NotFound:
-                        Log("The shebang.json file could not be found in this repository.", LogType.ERROR);
-                        break;
-                    case HttpStatusCode.ServiceUnavailable:
-                        Log("The GitHub services are currently unavailable or you are sending too much requests.", LogType.ERROR);
-                        break;
-                    default:
-                        Log($"An unknown error has occured (error {(int)response.StatusCode}).", LogType.ERROR);
-                        break;
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.NotFound:
+                            Log("The shebang.json file could not be found in this repository.", LogType.ERROR);
+                            break;
+                        case HttpStatusCode.ServiceUnavailable:
+                            Log("The GitHub services are currently unavailable or you are sending too much requests.", LogType.ERROR);
+                            break;
+                        default:
+                            Log($"An unknown error has occured (error {(int)response.StatusCode}).", LogType.ERROR);
+                            break;
+                    }
                 }
-
-                Log("Please report this to the author of the repository.", LogType.ERROR);
-                Log("If you are the author, see github.com/keesvv/shebang for more info.", LogType.ERROR);
+                catch (Exception)
+                {
+                    Log("The HTTP response could not be retrieved. Please make sure you have an internet connection", LogType.ERROR);
+                    Log("and make sure Shebang isn't being blocked by a firewall.", LogType.ERROR);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("An unknown error has occured. More details written down below:", LogType.ERROR);
+                Log($"Error message: {ex.Message}", LogType.ERROR);
+                Log($"Error code: {ex.HResult}", LogType.ERROR);
             }
         }
 
