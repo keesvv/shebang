@@ -9,12 +9,12 @@
     "commands": {
       "before_install": {
         "windows": "echo 'Sample before install message'",
-        "unix": "echo \"Sample before install message\""
+        "unix": "echo 'Sample before install message'"
       },
       
       "after_install": {
         "windows": "echo 'Sample after install message'",
-        "unix": "echo \"Sample after install message\""
+        "unix": "echo 'Sample after install message'"
       }
     }
   }
