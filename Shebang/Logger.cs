@@ -19,8 +19,12 @@ namespace Shebang
                     Console.Write("=> ");
                     break;
                 case LogType.ERROR:
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.Write(" ! ");
+                    Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("[!] ");
+                    Console.Write(" ");
                     break;
                 default:
                     break;
