@@ -108,7 +108,22 @@ namespace Shebang
                     Log("Error while setting permissions; do you have administrator/superuser rights?", LogType.ERROR);
                 }
 
-                // TO-DO: Create symlinks
+                var executablePath = Path.Combine(packageFolder, package.Properties.ExecutablePath);
+                Utils.CrossPlatformAction(
+                    // Windows-based systems
+                    () =>
+                    {
+                        Log("Creating shortcuts...");
+                        Log("Creating shortcuts in Windows is still not a feature.", LogType.WARN);
+                        Log($"You can find the main executable here: '{executablePath}'", LogType.WARN);
+                    },
+                    
+                    // Unix-based systems
+                    () =>
+                    {
+                        Log("Creating symlinks...");
+                        Utils.RunShellCommand($"ln -s {executablePath} /usr/bin/{package.Properties.SymlinkName}", false);
+                    });
 
                 Log("Running postinstall script...");
                 package.Properties.Commands.Execute(ScriptType.AFTER_INSTALL);
