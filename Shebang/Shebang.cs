@@ -13,27 +13,6 @@ namespace Shebang
 {
     public class Shebang
     {
-        public static void PrintSyntax()
-        {
-            string[] syntax = new string[]
-            {
-                "Error: You must specify a GitHub username and repository.",
-                "Format: shebang install <username>/<repository> [branch]",
-                "Example:",
-                "    shebang install keesvv/shebang",
-                "To remove a package, you can use the following command:",
-                "    shebang remove package-id",
-                "",
-                "If you would like to create a package, type shebang create.",
-                "You can also easily update Shebang by typing shebang update."
-            };
-
-            foreach (string line in syntax)
-            {
-                Console.WriteLine(line);
-            }            
-        }
-
         public static Package GetPackage(string json)
         {
             Package package = JsonConvert.DeserializeObject<Package>(json);
@@ -127,6 +106,7 @@ namespace Shebang
                     {
                         Log("Creating symlinks...");
                         Utils.RunShellCommand($"ln -s {executablePath} /usr/bin/{package.Properties.SymlinkName}", false);
+                        Utils.RunShellCommand($"sudo chmod +x /usr/bin/{package.Properties.SymlinkName}", false);
                     });
 
                 Log("Running postinstall script...");
@@ -175,6 +155,7 @@ namespace Shebang
 
         public static void CreatePackage()
         {
+
         }
 
         public static void RemovePackage(string packageId)
@@ -237,6 +218,7 @@ namespace Shebang
                 {
                     case "install":
                     case "i":
+                    case "get":
                         try
                         {
                             InstallPackage(args[1], args[2]);
@@ -255,8 +237,12 @@ namespace Shebang
                     case "update":
                         Utils.Update();
                         break;
+                    case "help":
+                        Utils.PrintSyntax();
+                        break;
                     default:
-                        Log("This command is not found.", LogType.WARN);
+                        Log("This command is not found.", LogType.ERROR);
+                        Log("Type [ shebang help ] to view all available commands.", LogType.ERROR);
                         break;
                 }
             }
