@@ -63,7 +63,7 @@ namespace Shebang
                 new ColoredString()
                 {
                     Text = " - Early beta - ",
-                    ForegroundColor = ConsoleColor.Red
+                    ForegroundColor = ConsoleColor.Yellow
                 },
 
                 new ColoredString()

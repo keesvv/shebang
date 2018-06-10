@@ -11,12 +11,12 @@ namespace Shebang
             {
                 case LogType.INFO:
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.Write("> ");
+                    Console.Write("=> ");
                     Console.ResetColor();
                     break;
                 case LogType.WARN:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("[~] ");
+                    Console.Write("=> ");
                     break;
                 case LogType.ERROR:
                     Console.ForegroundColor = ConsoleColor.Red;
