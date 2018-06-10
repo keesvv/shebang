@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Generic;
-using static Shebang.Models;
 using System.Reflection;
+
+using static Shebang.Models;
 
 namespace Shebang
 {
