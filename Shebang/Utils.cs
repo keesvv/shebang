@@ -4,7 +4,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Reflection;
 
+using ColorfulConsole = Colorful.Console;
 using static Shebang.Models;
+using static Shebang.Logger;
 
 namespace Shebang
 {
@@ -12,6 +14,28 @@ namespace Shebang
     {
         public static void Update()
         {
+            Log("This function has not been implemented yet. Try again later.", LogType.WARN);
+        }
+
+        public static void PrintSyntax()
+        {
+            string[] syntax = new string[]
+            {
+                "General syntax: shebang <command> [arguments ...]",
+                "Install syntax: shebang install <username>/<repository> [branch]",
+                "Example:",
+                "    shebang install keesvv/shebang",
+                "To remove a package, you can use the following command:",
+                "    shebang remove package-id",
+                "",
+                "If you would like to create a package, type shebang create.",
+                "You can also easily update Shebang by typing shebang update."
+            };
+
+            foreach (string line in syntax)
+            {
+                Console.WriteLine(line);
+            }
         }
 
         public static Version GetVersion()
@@ -51,18 +75,20 @@ namespace Shebang
             // Get the application version
             var version = GetVersion();
 
+            ColorfulConsole.WriteAscii("Shebang", Colorful.FigletFont.Load(Path.Combine("Fonts", "font.flf")));
+
             // TO-DO: Print splash screen with colors and ASCII art
             WriteColoredText(new List<ColoredString>()
             {
                 new ColoredString()
                 {
-                    Text = "Shebang (dotNET Core)",
+                    Text = "Shebang",
                     ForegroundColor = ConsoleColor.Cyan
                 },
 
                 new ColoredString()
                 {
-                    Text = " - Early beta - ",
+                    Text = " - dotNET Core beta - ",
                     ForegroundColor = ConsoleColor.Yellow
                 },
 
