@@ -89,9 +89,13 @@ namespace Shebang
                     BranchName = branch
                 });
 
+                StreamReader reader = new StreamReader(Path.Combine(packageFolder, "shebang.json"));
+                var packageJson = reader.ReadToEnd();
+                Package offlinePackage = GetPackage(packageJson);
+
                 Log("Successfully cloned.");
                 Log("Running preinstall script...");
-                package.Properties.Commands.Execute(ScriptType.BEFORE_INSTALL);
+                offlinePackage.Properties.Commands.Execute(ScriptType.BEFORE_INSTALL);
 
                 Log("Setting permissions...");
                 try
@@ -126,7 +130,7 @@ namespace Shebang
                     });
 
                 Log("Running postinstall script...");
-                package.Properties.Commands.Execute(ScriptType.AFTER_INSTALL);
+                offlinePackage.Properties.Commands.Execute(ScriptType.AFTER_INSTALL);
 
                 installStopwatch.Stop();
                 var elapsedSeconds = Math.Round(installStopwatch.Elapsed.TotalSeconds, 2);
@@ -142,10 +146,13 @@ namespace Shebang
                     switch (response.StatusCode)
                     {
                         case HttpStatusCode.NotFound:
-                            Log("The shebang.json file could not be found in this repository.", LogType.ERROR);
+                            Log("The shebang.json file could not be found in this repository or the repository does not exist.", LogType.ERROR);
                             break;
                         case HttpStatusCode.ServiceUnavailable:
                             Log("The GitHub services are currently unavailable or you are sending too much requests.", LogType.ERROR);
+                            break;
+                        case HttpStatusCode.BadRequest:
+                            Log("Error while installing the package; did you specify [username]/[repository]?", LogType.ERROR);
                             break;
                         default:
                             Log($"An unknown error has occured (error {(int)response.StatusCode}).", LogType.ERROR);
@@ -174,15 +181,21 @@ namespace Shebang
         {
             Log($"Removing package '{packageId}'...");
             string packageFolder = GetPackageFolder(packageId);
-            Utils.ForceDeleteDirectory(packageFolder);
-            Log("Package successfully removed!");
+
+            if (Directory.Exists(packageFolder))
+            {
+                Utils.ForceDeleteDirectory(packageFolder);
+                Log("Package successfully removed!");
+            }
+            else
+            {
+                Log("This package is not installed and will not be removed.", LogType.ERROR);
+            }
         }
 
         public static void Main(string[] args)
         {
-            // Clear the console window
-            Console.Clear();
-
+            // Print splash screen
             Utils.PrintSplash();
 
             try
@@ -218,8 +231,6 @@ namespace Shebang
             {
                 Log("You haven't specified any arguments.", LogType.ERROR);
             }
-
-            Console.ReadLine();
         }
     }
 }
