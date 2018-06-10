@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
-using Newtonsoft.Json;
 using System.IO;
-using LibGit2Sharp;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using LibGit2Sharp;
 
 using static Shebang.Serialization;
 using static Shebang.Logger;
@@ -181,6 +181,39 @@ namespace Shebang
         {
             Log($"Removing package '{packageId}'...");
             string packageFolder = GetPackageFolder(packageId);
+
+            Utils.CrossPlatformAction(
+                () =>
+                {
+                    Log("Skipping removal of symlinks...", LogType.WARN);
+                },
+                
+                () =>
+                {
+                    Log("Removing symlinks...");
+                    try
+                    {
+                        string rawJson;
+                        var descriptorPath = Path.Combine(packageFolder, "shebang.json");
+
+                        if (File.Exists(descriptorPath))
+                        {
+                            StreamReader reader = new StreamReader(descriptorPath);
+                            rawJson = reader.ReadToEnd();
+
+                            Package package = GetPackage(rawJson);
+                            var symlinkPath = $"/usr/bin/{package.Properties.SymlinkName}";
+                            if (File.Exists(symlinkPath))
+                                File.Delete(symlinkPath);
+                            else
+                                Log("Symlink not found, skipping...", LogType.WARN);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Unknown error while removing symlink.", LogType.ERROR);
+                    }
+                });
 
             if (Directory.Exists(packageFolder))
             {
