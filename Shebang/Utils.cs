@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Collections.Generic;
+using static Shebang.Models;
+using System.Reflection;
 
 namespace Shebang
 {
@@ -10,6 +11,68 @@ namespace Shebang
     {
         public static void Update()
         {
+        }
+
+        public static Version GetVersion()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version;
+        }
+
+        public static void WriteColoredText(string text, ConsoleColor color, ConsoleColor? bgColor, bool sameLine = false)
+        {
+            var oldColor = Console.ForegroundColor;
+            var oldBackgroundColor = Console.BackgroundColor;
+
+            Console.ForegroundColor = color;                
+            if (bgColor.HasValue) Console.BackgroundColor = bgColor.Value;
+
+            if (sameLine)
+                Console.Write(text);
+            else
+                Console.WriteLine(text);
+
+            Console.ForegroundColor = oldColor;
+            Console.BackgroundColor = oldBackgroundColor;
+        }
+
+        public static void WriteColoredText(List<ColoredString> coloredStrings)
+        {
+            foreach (var item in coloredStrings)
+            {
+                WriteColoredText(item.Text, item.ForegroundColor, item.BackgroundColor, true);
+            }
+
+            Console.WriteLine();
+        }
+
+        public static void PrintSplash()
+        {
+            // Get the application version
+            var version = GetVersion();
+
+            // TO-DO: Print splash screen with colors and ASCII art
+            WriteColoredText(new List<ColoredString>()
+            {
+                new ColoredString()
+                {
+                    Text = "Shebang (dotNET Core)",
+                    ForegroundColor = ConsoleColor.Cyan
+                },
+
+                new ColoredString()
+                {
+                    Text = " - Early beta - ",
+                    ForegroundColor = ConsoleColor.Red
+                },
+
+                new ColoredString()
+                {
+                    Text = $"v{version.Major}.{version.Minor}.{version.Build}",
+                    ForegroundColor = ConsoleColor.Green
+                }
+            });
+
+            Console.WriteLine();
         }
 
         public static void ForceDeleteDirectory(string directoryPath)
