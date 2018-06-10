@@ -6,6 +6,7 @@ using static Shebang.Logger;
 using static Shebang.Models;
 using System.IO;
 using LibGit2Sharp;
+using System.Diagnostics;
 
 namespace Shebang
 {
@@ -60,6 +61,7 @@ namespace Shebang
             string descriptorUrl = $"https://raw.githubusercontent.com/{repository}/{branch}/shebang.json";
 
             Log("Getting install descriptor...");
+            var installStopwatch = Stopwatch.StartNew();
             if (string.IsNullOrEmpty(repository))
             {
                 Log("Please specify a repository to install.", LogType.ERROR);
@@ -124,6 +126,12 @@ namespace Shebang
 
                 Log("Running postinstall script...");
                 package.Properties.Commands.Execute(ScriptType.AFTER_INSTALL);
+
+                installStopwatch.Stop();
+                var elapsedSeconds = Math.Round(installStopwatch.Elapsed.TotalSeconds, 2);
+
+                Log($"'{package.ID}' has been installed successfully!");
+                Log($"Installation took {elapsedSeconds} seconds.");
             }
             catch (WebException e)
             {
