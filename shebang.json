@@ -8,7 +8,7 @@
     "is_registered_package": true,
     "commands": {
       "before_install": {
-        "windows": "echo 'Sample before install message' && sleep 2 && echo 'Test'",
+        "windows": "echo 'Sample before install message'; sleep 2; echo 'Test'",
         "unix": "echo \"Sample before install message\""
       },
       
