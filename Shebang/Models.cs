@@ -18,5 +18,12 @@ namespace Shebang
             BEFORE_INSTALL = 0,
             AFTER_INSTALL = 1
         }
+
+        public class ColoredString
+        {
+            public string Text { get; set; }
+            public ConsoleColor ForegroundColor { get; set; }
+            public ConsoleColor? BackgroundColor { get; set; }
+        }
     }
 }
