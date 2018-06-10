@@ -71,48 +71,18 @@ namespace Shebang
                         break;
                 }
 
-                var process = new Process();
-                switch (Environment.OSVersion.Platform)
-                {
-                    case PlatformID.Win32S:
-                    case PlatformID.Win32Windows:
-                    case PlatformID.Win32NT:
-                    case PlatformID.WinCE:
-                        // Windows-based systems
-                        if (string.IsNullOrWhiteSpace(command.WindowsCommand)) return;
-                        process.StartInfo = new ProcessStartInfo()
-                        {
-                            FileName = "powershell",
-                            Arguments = "-Command \"" + command.WindowsCommand + "\"",
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true
-                        };
-                        break;
-                    case PlatformID.Unix:
-                    case PlatformID.MacOSX:
-                        // Unix-based systems
-                        if (string.IsNullOrWhiteSpace(command.UnixCommand)) return;
-                        process.StartInfo = new ProcessStartInfo()
-                        {
-                            FileName = "bash",
-                            Arguments = "-c \"" + command.UnixCommand + "\"",
-                            UseShellExecute = false,
-                            RedirectStandardOutput = true
-                        };
-                        break;
-                    default:
-                        break;
-                }
+                Utils.CrossPlatformAction(
+                    // Windows-based systems
+                    () =>
+                    {
+                        Utils.RunShellCommand(command.WindowsCommand);
+                    },
 
-                // Write the output data
-                process.OutputDataReceived += (o, ev) =>
-                {
-                    Console.WriteLine(ev.Data);
-                };
-
-                process.Start();
-                process.BeginOutputReadLine();
-                process.WaitForExit();
+                    // Unix-based systems
+                    () =>
+                    {
+                        Utils.RunShellCommand(command.UnixCommand);
+                    });
             }
         }
     }
