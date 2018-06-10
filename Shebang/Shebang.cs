@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net;
 using Newtonsoft.Json;
-using static Shebang.Serialization;
-using static Shebang.Logger;
-using static Shebang.Models;
 using System.IO;
 using LibGit2Sharp;
 using System.Diagnostics;
+
+using static Shebang.Serialization;
+using static Shebang.Logger;
+using static Shebang.Models;
 
 namespace Shebang
 {
