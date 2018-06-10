@@ -32,11 +32,6 @@ namespace Shebang
             }            
         }
 
-        public static void PrintSplash()
-        {
-            // TO-DO: Print splash screen with colors and ASCII art
-        }
-
         public static Package GetPackage(string json)
         {
             Package package = JsonConvert.DeserializeObject<Package>(json);
@@ -54,11 +49,13 @@ namespace Shebang
             return packagesFolder;
         }
 
+        public static string GetPackageFolder(string packageId)
+        {
+            return Path.Combine(GetPackagesFolder(), packageId);
+        }
+
         public static void InstallPackage(string repository, string branch = "master")
         {
-            // Clear the console window
-            Console.Clear();
-
             string repositoryUrl = $"https://github.com/{repository}";
             string descriptorUrl = $"https://raw.githubusercontent.com/{repository}/{branch}/shebang.json";
 
@@ -76,7 +73,7 @@ namespace Shebang
                 Package package = GetPackage(descriptor);
                 Log($"Installing '{package.Name}' (v-{package.Version}) ...");
 
-                string packageFolder = Path.Combine(GetPackagesFolder(), package.ID);
+                string packageFolder = GetPackageFolder(package.ID);
                 if (Directory.Exists(packageFolder))
                 {
                     Log($"'{package.ID}' already exists, reinstalling...");
@@ -166,10 +163,19 @@ namespace Shebang
 
         public static void RemovePackage(string packageId)
         {
+            Log($"Removing package '{packageId}'...");
+            string packageFolder = GetPackageFolder(packageId);
+            Utils.ForceDeleteDirectory(packageFolder);
+            Log("Package successfully removed!");
         }
 
         public static void Main(string[] args)
         {
+            // Clear the console window
+            Console.Clear();
+
+            Utils.PrintSplash();
+
             try
             {
                 switch (args[0])
