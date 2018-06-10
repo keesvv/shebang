@@ -209,7 +209,7 @@ namespace Shebang
                                 Log("Symlink not found, skipping...", LogType.WARN);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         Log("Unknown error while removing symlink.", LogType.ERROR);
                     }
