@@ -8,6 +8,8 @@ using LibGit2Sharp;
 using static Shebang.Serialization;
 using static Shebang.Logger;
 using static Shebang.Models;
+using static Shebang.Utils;
+using System.Collections.Generic;
 
 namespace Shebang
 {
@@ -17,22 +19,6 @@ namespace Shebang
         {
             Package package = JsonConvert.DeserializeObject<Package>(json);
             return package;
-        }
-
-        public static string GetPackagesFolder()
-        {
-            string packagesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "shebang", "packages");
-            if (!Directory.Exists(packagesFolder))
-            {
-                Directory.CreateDirectory(packagesFolder);
-            }
-
-            return packagesFolder;
-        }
-
-        public static string GetPackageFolder(string packageId)
-        {
-            return Path.Combine(GetPackagesFolder(), packageId);
         }
 
         public static void InstallPackage(string repository, string branch = "master")
@@ -59,7 +45,7 @@ namespace Shebang
                 if (Directory.Exists(packageFolder))
                 {
                     Log($"'{package.ID}' already exists, reinstalling...");
-                    Utils.ForceDeleteDirectory(packageFolder);
+                    ForceDeleteDirectory(packageFolder);
                 }
 
                 Log("Cloning repository...");
@@ -82,8 +68,10 @@ namespace Shebang
                     var files = Directory.GetFiles(packageFolder, "*.*", SearchOption.AllDirectories);
                     foreach (var file in files)
                     {
-                        FileInfo fileInfo = new FileInfo(file);
-                        fileInfo.Attributes = FileAttributes.Normal;
+                        FileInfo fileInfo = new FileInfo(file)
+                        {
+                            Attributes = FileAttributes.Normal
+                        };
                     }
                 }
                 catch (Exception)
@@ -92,7 +80,7 @@ namespace Shebang
                 }
 
                 var executablePath = Path.Combine(packageFolder, package.Properties.ExecutablePath);
-                Utils.CrossPlatformAction(
+                CrossPlatformAction(
                     // Windows-based systems
                     () =>
                     {
@@ -105,8 +93,8 @@ namespace Shebang
                     () =>
                     {
                         Log("Creating symlinks...");
-                        Utils.RunShellCommand($"ln -s {executablePath} /usr/bin/{package.Properties.SymlinkName}", false);
-                        Utils.RunShellCommand($"sudo chmod +x /usr/bin/{package.Properties.SymlinkName}", false);
+                        RunShellCommand($"ln -s {executablePath} /usr/bin/{package.Properties.SymlinkName}", false);
+                        RunShellCommand($"sudo chmod +x /usr/bin/{package.Properties.SymlinkName}", false);
                     });
 
                 Log("Running postinstall script...");
@@ -155,7 +143,89 @@ namespace Shebang
 
         public static void CreatePackage()
         {
+            WriteColoredText(@" // Package creation menu \\ ", ConsoleColor.White, ConsoleColor.DarkCyan);
+            Console.WriteLine();
 
+            // Create a package boilerplate
+            Package p = new Package()
+            {
+                Name = "Sample package",
+                ID = "sample-package",
+                Version = "1.0.0",
+                Properties = new PackageProperties()
+                {
+                    ExecutablePath = "",
+                    IsRegistered = true,
+                    Commands = new PackageCommands()
+                    {
+                        AfterInstall = new PackageCommand()
+                        {
+                            WindowsCommand = "echo 'Enter your commands here'",
+                            UnixCommand = "echo 'Enter your commands here'"
+                        },
+
+                        BeforeInstall = new PackageCommand()
+                        {
+                            WindowsCommand = "echo 'Enter your commands here'",
+                            UnixCommand = "echo 'Enter your commands here'"
+                        }
+                    }
+                }
+            };
+
+            Console.Write($"Package name: [{p.Name}] ");
+            var name = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(name)) p.Name = name;
+
+            Console.Write($"Package id: [{p.ID}] ");
+            var id = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                p.ID = id;
+                p.Properties.SymlinkName = id;
+            }
+            else
+                p.Properties.SymlinkName = p.ID;
+
+            Console.Write($"Package version: [{p.Version}] ");
+            var version = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(version)) p.Version = version;
+
+            var packageJson = p.ToString();
+            var jsonPath = Path.Combine(GetCustomDescriptorsFolder(p.ID), "shebang.json");
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(jsonPath))
+                {
+                    writer.Write(packageJson);
+                    writer.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log("Unknown exception while writing the JSON descriptor:", LogType.ERROR);
+                Log(ex.Message, LogType.ERROR);
+            }
+
+            Console.WriteLine();
+            WriteColoredText(new List<ColoredString>()
+            {
+                new ColoredString()
+                {
+                    Text = "Done! You can find the JSON descriptor at ",
+                    ForegroundColor = ConsoleColor.Green
+                },
+
+                new ColoredString()
+                {
+                    Text = $" {jsonPath} ",
+                    ForegroundColor = ConsoleColor.Black,
+                    BackgroundColor = ConsoleColor.Green
+                }
+            });
+
+            Console.WriteLine(Environment.NewLine + packageJson);
         }
 
         public static void RemovePackage(string packageId)
@@ -163,7 +233,7 @@ namespace Shebang
             Log($"Removing package '{packageId}'...");
             string packageFolder = GetPackageFolder(packageId);
 
-            Utils.CrossPlatformAction(
+            CrossPlatformAction(
                 () =>
                 {
                     Log("Skipping removal of symlinks...", LogType.WARN);
@@ -198,7 +268,7 @@ namespace Shebang
 
             if (Directory.Exists(packageFolder))
             {
-                Utils.ForceDeleteDirectory(packageFolder);
+                ForceDeleteDirectory(packageFolder);
                 Log("Package successfully removed!");
             }
             else
@@ -210,8 +280,9 @@ namespace Shebang
         public static void Main(string[] args)
         {
             // Print splash screen
-            Utils.PrintSplash();
+            PrintSplash();
 
+            // Command-line arguments parser
             try
             {
                 switch (args[0])
@@ -229,16 +300,24 @@ namespace Shebang
                         }
                         break;
                     case "create":
+                    case "new":
+                    case "make":
                         CreatePackage();
                         break;
                     case "remove":
+                    case "delete":
                         RemovePackage(args[1]);
                         break;
                     case "update":
-                        Utils.Update();
+                    case "upgrade":
+                        Update();
+                        break;
+                    case "clean":
+                        CleanDescriptors();
                         break;
                     case "help":
-                        Utils.PrintSyntax();
+                    case "?":
+                        PrintSyntax();
                         break;
                     default:
                         Log("This command is not found.", LogType.ERROR);
