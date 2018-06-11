@@ -2,6 +2,7 @@
 using System.Net;
 using System.IO;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using LibGit2Sharp;
 
@@ -9,7 +10,6 @@ using static Shebang.Serialization;
 using static Shebang.Logger;
 using static Shebang.Models;
 using static Shebang.Utils;
-using System.Collections.Generic;
 
 namespace Shebang
 {

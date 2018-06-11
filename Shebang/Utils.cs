@@ -115,7 +115,6 @@ namespace Shebang
                     Log("An unknown error occured while wiping descriptor data:", LogType.ERROR);
                     Log(ex.Message, LogType.ERROR);
                 }
-
             }
             else
                 Log("Cancelled.", LogType.WARN);
