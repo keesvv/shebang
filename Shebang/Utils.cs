@@ -12,9 +12,113 @@ namespace Shebang
 {
     public class Utils
     {
+        public static string GetMainFolder()
+        {
+            string mainFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "shebang");
+            if (!Directory.Exists(mainFolder))
+            {
+                Directory.CreateDirectory(mainFolder);
+            }
+
+            return mainFolder;
+        }
+
+        public static string GetPackagesFolder()
+        {
+            string packagesFolder = Path.Combine(GetMainFolder(), "packages");
+            if (!Directory.Exists(packagesFolder))
+            {
+                Directory.CreateDirectory(packagesFolder);
+            }
+
+            return packagesFolder;
+        }
+
+        public static string GetPackageFolder(string packageId)
+        {
+            return Path.Combine(GetPackagesFolder(), packageId);
+        }
+
+        public static string GetCustomDescriptorsFolder()
+        {
+            string customDescriptorsFolder = Path.Combine(GetMainFolder(), "descriptors");
+            if (!Directory.Exists(customDescriptorsFolder))
+            {
+                Directory.CreateDirectory(customDescriptorsFolder);
+            }
+
+            return customDescriptorsFolder;
+        }
+
+        public static string GetCustomDescriptorsFolder(string packageId)
+        {
+            string descriptorFolder = Path.Combine(GetCustomDescriptorsFolder(), packageId);
+            if (!Directory.Exists(descriptorFolder))
+            {
+                Directory.CreateDirectory(descriptorFolder);
+            }
+
+            return descriptorFolder;
+        }
+
         public static void Update()
         {
             Log("This function has not been implemented yet. Try again later.", LogType.WARN);
+        }
+
+        public static void CleanDescriptors()
+        {
+            WriteColoredText(new List<ColoredString>()
+            {
+                new ColoredString()
+                {
+                    Text = "Are you sure you want to clean all created descriptors?" + Environment.NewLine + "This will wipe all data from ",
+                    ForegroundColor = ConsoleColor.Red
+                },
+
+                new ColoredString()
+                {
+                    Text = GetCustomDescriptorsFolder(),
+                    ForegroundColor = ConsoleColor.Yellow
+                },
+
+                new ColoredString()
+                {
+                    Text = "." + Environment.NewLine + Environment.NewLine,
+                    ForegroundColor = ConsoleColor.Red
+                },
+
+                new ColoredString()
+                {
+                    Text = " Continue [ Y/n ] ",
+                    ForegroundColor = ConsoleColor.Black,
+                    BackgroundColor = ConsoleColor.Red
+                }
+            });
+
+            var key = Console.ReadKey(true).Key;
+            Console.WriteLine();
+
+            if (key == ConsoleKey.Y || key == ConsoleKey.Enter)
+            {
+                try
+                {
+                    foreach (var directory in Directory.GetDirectories(GetCustomDescriptorsFolder()))
+                    {
+                        Directory.Delete(directory, true);
+                    }
+
+                    Log("Descriptor data successfully wiped.", LogType.INFO);
+                }
+                catch (Exception ex)
+                {
+                    Log("An unknown error occured while wiping descriptor data:", LogType.ERROR);
+                    Log(ex.Message, LogType.ERROR);
+                }
+
+            }
+            else
+                Log("Cancelled.", LogType.WARN);
         }
 
         public static void PrintSyntax()
