@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using Newtonsoft.Json;
-using static Shebang.Logger;
 using static Shebang.Models;
 
 namespace Shebang
@@ -22,6 +20,15 @@ namespace Shebang
 
             [JsonProperty("properties")]
             public PackageProperties Properties { get; set; }
+
+            /// <summary>
+            /// Get the JSON string for the package.
+            /// </summary>
+            /// <returns>JSON string</returns>
+            public override string ToString()
+            {
+                return JsonConvert.SerializeObject(this, Formatting.Indented);
+            }
         }
 
         public class PackageProperties
